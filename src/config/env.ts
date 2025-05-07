@@ -9,4 +9,6 @@ export const
         MONGODB_URI,
         BASE_URL,
         JWT_SECRET,
+        EMAIL_PASSWORD,
+        EMAIL_ADDRESS_SENDER
     } = process.env;
