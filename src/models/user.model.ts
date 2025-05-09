@@ -21,6 +21,11 @@ const userSchema = new mongoose.Schema({
     name: { type: String },
     isVerified: { type: Boolean, default: false },
     settings: settingsSchema,
+    role: {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user'
+    },
     progress: [progressSchema]
 }, {timestamps: true});
 
