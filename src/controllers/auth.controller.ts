@@ -53,13 +53,21 @@ export const signIn = async (req: Request, res: Response, next: NextFunction) =>
             JWT_SECRET,
             {expiresIn: '7d'}
         );
+
+        if (!user.isVerified) {
+            const userCode = await Code.findOne({userId: user._id})
+            if (!userCode) {
+                await GenerateAndSendCode(user._id, user.email, user.name)
+            }
+        }
+
         res.status(200).json({success: true, data: {token, user}});
     } catch (e) {
         next(e);
     }
 }
 
-export const verifyUser = async (req: AuthenticatedRequest, res: Response, next: NextFunction) : Promise<void> => {
+export const verifyUser = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
         if (req.user.isVerified) {
             res.status(200).send({success: true})
@@ -91,9 +99,14 @@ export const verifyUser = async (req: AuthenticatedRequest, res: Response, next:
     }
 }
 
-export const resendCode = async (req: Request, res: Response, next: NextFunction) => {
+export const checkEmail = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        const {email} = req.body || {};
+        if (!email)
+            return next(new HttpError('Enter correct data', 400));
 
+        const user = await User.findOne({email})
+        res.status(200).send({success: true, isUserExist: !!user})
     } catch (e) {
         next(e);
     }

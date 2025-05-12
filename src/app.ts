@@ -18,7 +18,7 @@ app.use(`${BASE_URL}/lesson`, LessonRouter)
 
 app.use(errorHandlerMiddleware)
 
-app.listen(APP_PORT, async () => {
+app.listen(Number(APP_PORT), '0.0.0.0', async () => {
     console.log(`App listening on http://localhost:${APP_PORT}`);
     await connectToDataBase();
 })
