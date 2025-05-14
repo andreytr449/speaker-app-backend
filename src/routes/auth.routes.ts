@@ -3,7 +3,7 @@ import {
     signIn,
     signUp,
     verifyUser,
-    resendCode
+    checkEmail
 } from "../controllers/auth.controller";
 import {auth} from "../middlewares/auth.middleware";
 
@@ -18,7 +18,7 @@ authRouter.post('/sign-up', signUp)
 // PATH: api/v1/auth/verify [POST]
 authRouter.post('/verify', auth, verifyUser)
 
-// PATH: api/v1/auth/resend-code [POST]
-authRouter.post('/resend-code', auth, resendCode)
+// PATH: api/v1/auth/check-email [POST]
+authRouter.post('/check-email', checkEmail)
 
 export default authRouter;

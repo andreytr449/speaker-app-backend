@@ -8,28 +8,55 @@ import {Code} from "../models/code.model";
 import {AuthenticatedRequest} from "../../types/express";
 import {GenerateAndSendCode} from "../utils/generate-and-send-code";
 
-export const signUp = async (req: Request, res: Response, next: NextFunction) => {
+export const signUp = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-        const {email, password, name} = req.body || {};
+        const { email, password, name } = req.body || {};
         if (!email || !password || !name || !name.trim()) {
             return next(new HttpError('Enter correct data', 400));
         }
+
         if (password.length < 6) {
             return next(new HttpError('Enter stronger password', 400));
         }
-        const isUserExist = await User.findOne({email})
-        if (isUserExist) {
-            return next(new HttpError('Something went wrong', 400));
-        }
+
+        let user = await User.findOne({ email });
+
         const hashPassword = await bcrypt.hash(password, 8);
-        const user = await User.create({name, email, password: hashPassword});
-        const token = jwt.sign({userId: user._id}, JWT_SECRET, {expiresIn: '7d'});
-        await GenerateAndSendCode(user._id, user.email, user.name)
-        res.status(200).json({success: true, data: {token, user}});
+
+        // Якщо користувач є, але не верифікований
+        if (user && !user.isVerified) {
+            user.name = name;
+            user.password = hashPassword;
+            await user.save();
+
+            const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });
+
+            const userCode = await Code.findOne({ userId: user._id });
+            if (!userCode) {
+                await GenerateAndSendCode(user._id, user.email, user.name);
+            }
+
+            res.status(200).json({ success: true, data: { token, user } });
+            return;
+        }
+
+        // Якщо користувач є і вже верифікований
+        if (user && user.isVerified) {
+            return next(new HttpError('User already exists and is verified', 400));
+        }
+
+        // Якщо користувача нема
+        user = await User.create({ name, email, password: hashPassword });
+        const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });
+
+        await GenerateAndSendCode(user._id, user.email, user.name);
+
+        res.status(200).json({ success: true, data: { token, user } });
     } catch (e) {
         next(e);
     }
 };
+
 
 export const signIn = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -53,13 +80,21 @@ export const signIn = async (req: Request, res: Response, next: NextFunction) =>
             JWT_SECRET,
             {expiresIn: '7d'}
         );
+
+        if (!user.isVerified) {
+            const userCode = await Code.findOne({userId: user._id})
+            if (!userCode) {
+                await GenerateAndSendCode(user._id, user.email, user.name)
+            }
+        }
+
         res.status(200).json({success: true, data: {token, user}});
     } catch (e) {
         next(e);
     }
 }
 
-export const verifyUser = async (req: AuthenticatedRequest, res: Response, next: NextFunction) : Promise<void> => {
+export const verifyUser = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
         if (req.user.isVerified) {
             res.status(200).send({success: true})
@@ -91,9 +126,18 @@ export const verifyUser = async (req: AuthenticatedRequest, res: Response, next:
     }
 }
 
-export const resendCode = async (req: Request, res: Response, next: NextFunction) => {
+export const checkEmail = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        const {email} = req.body || {};
+        if (!email)
+            return next(new HttpError('Enter correct data', 400));
 
+        const user = await User.findOne({email})
+        res.status(200).send({
+            success: true,
+            isUserExist: !!user,
+            isVerified: user.isVerified
+        })
     } catch (e) {
         next(e);
     }
