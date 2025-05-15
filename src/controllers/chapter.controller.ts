@@ -27,7 +27,12 @@ export const getChapters = async (req, res, next) => {
         const chapters = await Chapter.find()
             .skip(skip)
             .limit(limit)
-            .sort({ order: 1 });
+            .sort({ order: 1 })
+            .populate({
+                path: 'topics',
+                options: { sort: { order: 1 } }
+            });
+
 
         const total = await Chapter.countDocuments();
 
