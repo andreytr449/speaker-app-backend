@@ -5,7 +5,7 @@ import {HttpError} from "../utils/error-type";
 import {User} from "../models/user.model";
 import {JWT_SECRET} from "../config/env";
 import {Code} from "../models/code.model";
-import {AuthenticatedRequest} from "../../types/express";
+import {AuthenticatedRequest} from "../types/express";
 import {GenerateAndSendCode} from "../utils/generate-and-send-code";
 
 export const signUp = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -23,7 +23,6 @@ export const signUp = async (req: Request, res: Response, next: NextFunction): P
 
         const hashPassword = await bcrypt.hash(password, 8);
 
-        // Якщо користувач є, але не верифікований
         if (user && !user.isVerified) {
             user.name = name;
             user.password = hashPassword;
@@ -40,12 +39,10 @@ export const signUp = async (req: Request, res: Response, next: NextFunction): P
             return;
         }
 
-        // Якщо користувач є і вже верифікований
         if (user && user.isVerified) {
             return next(new HttpError('User already exists and is verified', 400));
         }
 
-        // Якщо користувача нема
         user = await User.create({ name, email, password: hashPassword });
         const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });
 

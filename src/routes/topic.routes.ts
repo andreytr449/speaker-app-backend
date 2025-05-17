@@ -8,7 +8,7 @@ const TopicRouters = Router()
 // PATH: api/v1/topic/ [GET]
 TopicRouters.get('/', auth, GetAllTopics)
 
-// PATH: api/v1/topic/create [POST]
-TopicRouters.post('/create', auth, isAdmin, createTopic)
+// PATH: api/v1/topic/ [POST]
+TopicRouters.post('/', auth, isAdmin, createTopic)
 
 export default TopicRouters;

@@ -5,8 +5,8 @@ import {auth} from "../middlewares/auth.middleware";
 
 const ChapterRouter = Router()
 
-// PATH: api/v1/chapter/create [POST]
-ChapterRouter.post('/create', auth, isAdmin, CreateChapter)
+// PATH: api/v1/chapter/ [POST]
+ChapterRouter.post('/', auth, isAdmin, CreateChapter)
 
 // PATH: api/v1/chapter/ [GET]
 ChapterRouter.get('/', auth, getChapters)

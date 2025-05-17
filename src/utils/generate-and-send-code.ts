@@ -4,7 +4,6 @@ import mongoose from "mongoose";
 
 
 export const GenerateAndSendCode = async (userId: mongoose.Types.ObjectId, userEmail: string, userName: string) => {
-    console.log(userId, userEmail, userName);
     const code = Math.floor(1000 + Math.random() * 9000);
     await Code.create({userId, code})
     await sendEmail({
