@@ -1,6 +1,6 @@
 <div align="center">
   <br />
-    <a href="https://www.youtube.com/watch?v=E-fdPfRxkzQ" target="_blank">
+    <a href="https://github.com/andreytr449/speaker-app-backend" target="_blank">
       <img src="public/server-side-banner.jpg" alt="Project Banner">
     </a>
   <br />
@@ -217,8 +217,8 @@ Response
 ```json
 {
   "success": true,
-  "isUserExist": boolean,
-  "isVerified": boolean
+  "isUserExist": "boolean",
+  "isVerified": "boolean"
 }
 
 ```
@@ -276,4 +276,20 @@ Response
 │
 └── tsconfig.json                  # TypeScript compiler configuration
 ```
+---
 
+## <a name="license">🛡️  License</a>
+
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+---
+
+## <a name="author">✍️  Author</a>
+
+💼 GitHub: [https://github.com/andreytr449](https://github.com/andreytr449)
+
+
+This project was created as part of a personal project.
+
+© 2025 All rights reserved.
