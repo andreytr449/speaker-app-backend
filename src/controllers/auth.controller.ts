@@ -133,7 +133,7 @@ export const checkEmail = async (req: Request, res: Response, next: NextFunction
         res.status(200).send({
             success: true,
             isUserExist: !!user,
-            isVerified: user.isVerified
+            isVerified: user?.isVerified ?? false
         })
     } catch (e) {
         next(e);
